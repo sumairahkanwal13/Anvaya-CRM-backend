@@ -418,12 +418,12 @@ app.get("/leads/:id/comments", async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Validate lead ID
+    
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: "Invalid Lead ID." });
     }
 
-    // Make sure lead exists
+    
     const lead = await Lead.findById(id);
     if (!lead) {
       return res.status(404).json({
@@ -431,7 +431,7 @@ app.get("/leads/:id/comments", async (req, res) => {
       });
     }
 
-    // Fetch comments
+    
     const comments = await Comment.find({ lead: id })
       .populate("author", "name")   
       .sort({ createdAt: -1 });    
