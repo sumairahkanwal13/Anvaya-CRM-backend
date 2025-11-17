@@ -353,46 +353,44 @@ app.get("/leads/:id", async (req, res) => {
 // ----------------- Comment's Routes -----------------//
 
 //1. Add a Comment to a Lead.
-
 app.post("/leads/:id/comments", async (req, res) => {
   try {
     const { id } = req.params;
     const { commentText, author } = req.body;
 
-    
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!mongoose.Types.ObjectId.isValid(id))
       return res.status(400).json({ error: "Invalid Lead ID." });
-    }
 
-    if (!commentText || typeof commentText !== "string") {
-      return res.status(400).json({ error: "commentText is required and must be a string." });
-    }
+    if (!commentText)
+      return res.status(400).json({ error: "commentText is required." });
 
-    if(!mongoose.Types.ObjectId.isValid(author)){
-        return res.status(400).json({error: "Invalid author ID."})
-    }
+    if (!mongoose.Types.ObjectId.isValid(author))
+      return res.status(400).json({ error: "Invalid author ID." });
 
-    const agent = await SalesAgent.findById(author)
-    if(!agent){
-        return res.status(400).json({error: "Author (SalesAgent) not found."})
-    }
-    
+    const agent = await SalesAgent.findById(author);
+
+    if (!agent)
+      return res.status(404).json({ error: "Author (SalesAgent) not found." });
+
     const newComment = new Comment({
       lead: id,
-      author: author || { name: "Anonymous"},
+      author: author,
       commentText: commentText,
     });
 
-    
     const savedComment = await newComment.save();
 
-    
-    res.status(201).json(savedComment);
+    const populated = await Comment.findById(savedComment._id)
+      .populate("author", "name");
+
+    res.status(201).json(populated);
   } catch (error) {
     console.error("Error while adding comment:", error);
     res.status(500).json({ error: "Failed to add comment." });
   }
 });
+
+
 
 //2. Get all comments.
 app.get("/leads/:id/comments", async (req, res) => {
