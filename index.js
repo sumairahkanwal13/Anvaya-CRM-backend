@@ -171,7 +171,7 @@ app.get("/leads", async(req, res) => {
     try{
         const { source, salesAgent, status, tags} = req.query;
 
-        const validSources = ["Referral", "Website", "Social Media", "Advertisement", "Other"];
+        const validSources = ['Website', 'Referral', 'Cold Call', 'Advertisement', 'Email', 'Other'];
         const validStatuses = ["New", "Contacted", "Qualified", "Proposal Sent", "Closed"];
 
         const filter = {};
