@@ -124,6 +124,33 @@ app.delete("/agents/:agentId", async (req, res) => {
   }
 });
 
+// Get single Sales Agent by Id.
+app.get("/agents/:id", async(req, res) => {
+
+    const { id } = req.params;
+
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(400).json({error: "Invalid agent id."})
+    };
+
+    try{
+        const agent = await SalesAgent.findById(id);
+        if(!agent){
+            return res.status(404).json({error: `Agent with ID '${agentId}' not found.`})
+        }
+
+        res.json({
+            id: agent._id,
+            name: agent.name,
+            email: agent.email,
+            createdAT: agent.createdAt,
+        });
+
+    } catch(error){
+        res.status(500).json({error: "Failed to get agents details."})
+    }
+})
+
 
 // --------------- Leads Routes ------------------
 
