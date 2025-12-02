@@ -90,7 +90,40 @@ app.get("/agents", async(req, res) => {
     }catch(error){
         res.status(500).json({error: "Failed to fetch sales agents."})
     }
-})
+});
+
+// 3. Delete a Sales Agent
+async function deleteSalesAgent(agentId) {
+  try {
+    const deletedAgent = await SalesAgent.findByIdAndDelete(agentId);
+    return deletedAgent;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+app.delete("/agents/:agentId", async (req, res) => {
+  try {
+    const { agentId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(agentId)) {
+      return res.status(404).json({ error: "Invalid Agent ID format." });
+    }
+
+    console.log(agentId);
+    const deletedAgent = await deleteSalesAgent(agentId);
+
+    if (!deletedAgent) {
+      return res.status(404).json({ error: `Agent with ID '${agentId}' not found.` });
+    }
+
+    res.status(200).json({ message: "Agent deleted successfully." });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete the agent." });
+  }
+});
+
 
 // --------------- Leads Routes ------------------
 
@@ -494,7 +527,7 @@ app.get("/report/last-week", async(req, res) => {
  })
 
  //Total Closed vs Pipeline
- app.get("/report/closed-vs-pipleine", async(req,res) => {
+ app.get("/report/closed-vs-pipeline", async(req,res) => {
     try{
        const closed = await Lead.countDocuments({status: "Closed"})
        const pipeline = await Lead.countDocuments({ status: { $ne: "Closed"} });
@@ -564,5 +597,5 @@ app.get("/report/status-distribution", async(req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`)
-})
+   console.log(`Server is running on port ${PORT}`)
+});
